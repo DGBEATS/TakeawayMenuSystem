@@ -5,5 +5,5 @@ public class Order
         private int orderId;
         private int customerId;
         private Map<MenuItem, Integer> items; // MenuItem (Key) -> Quantity (Value)
-        private String status; // e.g., "Preparing", "Completed", "Cancelled"
+        private String status; // "Preparing", "Completed", "Cancelled"
 }
