@@ -42,6 +42,7 @@ public class Login {
         } else {
             System.out.println("Invalid username or password. Try again.");
         }
+        scanner.close();
     }
 
     private static boolean validateCredentials(String username, String password, String userType) {
@@ -61,21 +62,51 @@ public class Login {
         }
         return false;
     }
+    
+    private static boolean usernameExists(String username) {
+    	try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))){
+    		String line;
+    		while ((line = reader.readLine()) != null) {
+    			String[] credentials = line.split(",");
+    			if (credentials.length > 0 && credentials[0].equals(username)) {
+    				return true;
+    			}
+    		}
+    	} catch (IOException e) {
+    		System.out.println("Error reading the credentials file: " + e.getMessage());
+    	}
+    	return false;
+    }
 
     private static void createAccount(String userType) {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("Enter a new username:");
         String username = scanner.nextLine();
-
-        System.out.println("Enter a new password:");
+        
+        while (usernameExists(username)) {
+        	System.out.println("Username already exists. Please choose another: ");
+        	username = scanner.nextLine();
+        }
+        
+        System.out.println("Enter a new password (commas are not allowed):");
         String password = scanner.nextLine();
+        
+        while (password.contains(",")) {
+        	System.out.println("Error: Password cannot contains commas.");
+        	System.out.println("Enter a new password:");
+        	password = scanner.nextLine();
+        }
+
+//        System.out.println("Enter a new password:");
+//        String password = scanner.nextLine();
 
         if (addCredentials(username, password, userType)) {
             System.out.println("Account created successfully! You can now log in.");
         } else {
             System.out.println("Error creating account. Please try again.");
         }
+        scanner.close();
     }
 
     private static boolean addCredentials(String username, String password, String userType) {
@@ -102,5 +133,6 @@ public class Login {
             System.out.println("Invalid input. Please type 'y' or 'n'.");
             logOut(userType);
         }
+        scanner.close();
     }
 }
