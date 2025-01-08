@@ -37,6 +37,8 @@ public class Login {
 
         if (validateCredentials(username, password, userType)) {
             System.out.println("Welcome to the " + userType + " portal!");
+
+            logOut(userType);
         } else {
             System.out.println("Invalid username or password. Try again.");
         }
@@ -85,5 +87,20 @@ public class Login {
             System.out.println("Error writing to the credentials file: " + e.getMessage());
         }
         return false;
+    }
+
+    private static void logOut(String userType) {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Would you like to log out? (y/n)");
+        String answer = scanner.nextLine();
+        if (answer.equalsIgnoreCase("y")) {
+            System.out.println("You have been logged out. Returning to guest status.");
+            main(new String[]{});
+        } else if (answer.equalsIgnoreCase("n")) {
+            System.out.println("You are still logged in as a " + userType + ".");
+        } else {
+            System.out.println("Invalid input. Please type 'y' or 'n'.");
+            logOut(userType);
+        }
     }
 }
