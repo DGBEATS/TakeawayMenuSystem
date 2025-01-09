@@ -100,8 +100,16 @@ public class Login {
 
 //        System.out.println("Enter a new password:");
 //        String password = scanner.nextLine();
+        
+        //PHONE NUMBER + VALIDATION
+        System.out.println("Enter your phone number (numbers only): ");
+        String phone = scanner.nextLine();
+        while (!phone.matches("\\d+")) {
+        	System.out.println("Invalid phone number. Please enter numbers only:");
+        	phone = scanner.nextLine();
+        }
 
-        if (addCredentials(username, password, userType)) {
+        if (addCredentials(username, password, userType, phone)) {
             System.out.println("Account created successfully! You can now log in.");
         } else {
             System.out.println("Error creating account. Please try again.");
@@ -109,9 +117,9 @@ public class Login {
         scanner.close();
     }
 
-    private static boolean addCredentials(String username, String password, String userType) {
+    private static boolean addCredentials(String username, String password, String userType, String phone) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            writer.write(username + "," + password + "," + userType);
+            writer.write(username + "," + password + "," + userType + "," + phone);
             writer.newLine();
             return true;
         } catch (IOException e) {
