@@ -108,8 +108,32 @@ public class Login {
         	System.out.println("Invalid phone number. Please enter numbers only:");
         	phone = scanner.nextLine();
         }
+        
+        //EMAIL + VALIDATION
+        System.out.println("Enter your email address: ");
+        String email = scanner.nextLine();
+        while (!email.contains("@") || !email.contains(".")) {
+        	System.out.println("Invalid email format. Please enter a valid email address: ");
+        	email = scanner.nextLine();
+        }
+        
+        //ADDRESS + VALIDATION
+        System.out.println("Enter your address (no commmas allowed): ");
+        String address = scanner.nextLine();
+        while (address.contains(",")) {
+        	System.out.println("Address cannot contains commas. Please enter again: ");
+        	address = scanner.nextLine();
+        }
+        
+        //BANK DETAILS + VALIDATION
+        System.out.println("Enter your card number (16 digits): ");
+        String cardNumber = scanner.nextLine();
+        while (!cardNumber.matches("\\d{16}")) {
+        	System.out.println("Invalid card number. Please enter 16 digits: ");
+        	cardNumber = scanner.nextLine();
+        }
 
-        if (addCredentials(username, password, userType, phone)) {
+        if (addCredentials(username, password, userType, phone, email, address, cardNumber)) {
             System.out.println("Account created successfully! You can now log in.");
         } else {
             System.out.println("Error creating account. Please try again.");
@@ -117,9 +141,9 @@ public class Login {
         scanner.close();
     }
 
-    private static boolean addCredentials(String username, String password, String userType, String phone) {
+    private static boolean addCredentials(String username, String password, String userType, String phone, String email, String address, String cardNumber) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            writer.write(username + "," + password + "," + userType + "," + phone);
+            writer.write(username + "," + password + "," + userType + "," + phone + "," + email + "," + address + "," + cardNumber);
             writer.newLine();
             return true;
         } catch (IOException e) {
