@@ -5,61 +5,121 @@ import java.util.Scanner;
 
 public class Menu {
 
-	private static final String FILE_NAME = "src/menu.txt";
-	private static final String FILE_NAME2 = "src/credentials.txt";
+    private static final String FILE_NAME = "src/menu.txt";
+    private static final String FILE_NAME2 = "src/credentials.txt";
 
-	private static String cutlery;
-	private static String paymentMethod;
-	private static String review;
-	private static String extrainfo;
-	private static String cardnumber;
-	private static String feedback;
+    private static String cutlery;
+    private static String paymentMethod;
+    private static String review;
+    private static String extrainfo;
+    private static String cardnumber;
+    private static String feedback;
+    private static String collectChoice;
 
-	public static void main(String[] args) {
-
-		initialDisplay();
-		displayMenu();
+    public static void main(String[] args) {
 
 
-		cutlery = getCutlery();
-		paymentMethod = getPaymentMethod();
-		review = getReview();
-		extrainfo = extraInfo();
-		feedback = feedback();
+        initialDisplay();
+        displayMenu();
+        foodBasket();
 
 
-		System.out.println("Cutlery: " + cutlery);
-		System.out.println("Payment Method: " + paymentMethod);
-		System.out.println("Review: " + review);
-		System.out.println("Extrainfo: " + extrainfo);
-		System.out.println("Your Feedback: " + feedback);
-
-		// need to write code that retrieves username + card info from other class
-	}
+        cutlery = getCutlery();
+        paymentMethod = getPaymentMethod();
+        collectChoice = getCollectChoice();
+        review = getReview();
+        extrainfo = extraInfo();
+        feedback = feedback();
 
 
-	public static void initialDisplay() {
-		System.out.println("Welcome to the Tasty House Menu! Here is the current food and drink items available:\n ");
-	}
+        System.out.println("Cutlery: " + cutlery);
+        System.out.println("Payment Method: " + paymentMethod);
+        System.out.println("Review: " + review);
+        System.out.println("Extrainfo: " + extrainfo);
+        System.out.println("Your Feedback: " + feedback);
+
+        // need to write code that retrieves username + card info from other class
+    }
 
 
-	public static void displayMenu() {
-		try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
-			String line;
-			while ((line = reader.readLine()) != null) {
+    public static void initialDisplay() {
+        System.out.println("Welcome to the Tasty House Menu! Here is the current food and drink items available:\n ");
+    }
 
 
-				String[] parts = line.split(",");
-				if (parts.length == 3) {
-					String itemName = parts[0].trim();
-					String price = parts[2].trim();
-					System.out.println(itemName + " - " + price);
-				}
-			}
-		} catch (IOException e) {
-			System.out.println("Error reading the menu file: " + e.getMessage());
-		}
-	}
+    public static void displayMenu() {
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+            String line;
+            while ((line = reader.readLine()) != null)
+            {
+                String[] parts = line.split(",");
+                if (parts.length == 4)
+                {
+                    String itemName = parts[0].trim();
+                    String price = parts[2].trim();
+                    String select = parts[3].trim();
+                    //String itemDescription = parts[3].trim();
+                    //String quantity = parts[3].trim();
+                    System.out.println(select + ". " + itemName + " - £" + price);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Error reading the menu.txt file: " + e.getMessage());
+        }
+    }
+
+    public static void foodBasket() {
+        Scanner scanner = new Scanner(System.in);
+        double basketCost = 0;
+
+        System.out.println("\nEnter the number of the item you want to add to your basket.");
+        System.out.println("Type 'done' when you are finished:");
+
+        while (true) {
+            String input = scanner.nextLine().toLowerCase();
+
+            // Check if the user is done
+            if (input.equals("done")) {
+                break;
+            }
+
+            boolean found = false; // To track if a valid item was selected
+
+            try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
+                String line;
+
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length == 4) {
+                        String itemName = parts[0].trim();
+                        String price = parts[2].trim();
+                        String select = parts[3].trim(); // Number in the text file
+
+                        double priceAsDouble = Double.parseDouble(price); // Convert string price to double
+
+                        if (input.equals(select))
+                        {
+                            // Item found and added to basket
+                            System.out.println("You selected: " + itemName + " - Price: £" + price);
+                            basketCost += priceAsDouble;
+                            System.out.println("Adding " + itemName + " to your basket...");
+                            System.out.println("Current basket cost: $" + basketCost + "\n");
+                            found = true; // Mark item as found
+                            break; 
+                        }
+                    }
+                }
+                
+                if (!found) {
+                    System.out.println("Please select a number from the menu!\n");
+                }
+            } catch (IOException e) {
+                System.out.println("Error reading the menu.txt file: " + e.getMessage());
+            }
+        }
+        // Display the final cost of basket 
+        System.out.println("\nYour final basket cost: $" + basketCost);
+    }
 
 
 	public static String getCutlery() {
