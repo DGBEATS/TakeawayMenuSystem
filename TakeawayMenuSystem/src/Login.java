@@ -1,6 +1,6 @@
 
 import java.io.*;
-        import java.util.*;
+import java.util.*;
 
 public class Login {
 
@@ -9,7 +9,7 @@ public class Login {
     private static String password;
     private static String userType;
 
-    private static final Scanner scanner = new Scanner(System.in); 
+    private static final Scanner scanner = new Scanner(System.in);
 
     public static void main(String[] args) {
         System.out.println("Would you like to access the takeaway menu system as an admin, customer, or remain as a guest?");
@@ -25,6 +25,8 @@ public class Login {
             }
         } else {
             System.out.println("Please continue to the takeaway menu system as a guest.");
+            MenuSystem menuSystem = new MenuSystem();
+            menuSystem.start();
         }
     }
 
