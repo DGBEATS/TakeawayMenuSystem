@@ -100,6 +100,7 @@ class OrderManager {
     private List<Order> orders;
     private Scanner scanner;
     private String deliveryaddress;
+    String time = "";
 
     public OrderManager() {
         this.orders = new ArrayList<>();
@@ -124,7 +125,8 @@ class OrderManager {
             System.out.println("5. Extra Information");
             System.out.println("6. Add delivery info");
             System.out.println("7. Change delivery address/ Add address for guests");
-            System.out.println("8. Cancel Order");
+            System.out.println("8. Schedule delivery for later");
+            System.out.println("9. Cancel Order");
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
@@ -168,7 +170,11 @@ class OrderManager {
                     deliveryaddress = deliveryAddress();
                     System.out.println("Delivery address is:" + deliveryaddress);
                 }
-                case 8 -> {
+                case 8 ->{
+                    time = orderTime();
+                    System.out.println("Order time: " + time);
+                }
+                case 9 -> {
                     System.out.println("Order cancelled.\n");
                     return;
                 }
@@ -185,6 +191,8 @@ class OrderManager {
         System.out.println("Items ordered:");
         order.displayOrder();
 
+
+        System.out.println("\nOrder Receipt:");
 
         System.out.printf("Total Basket Cost: £%.2f\n", basketCost);
 
@@ -203,7 +211,10 @@ class OrderManager {
 
         System.out.println("Delivery Information: " + (deliveryInfo.isEmpty() ? "No additional delivery information" : deliveryInfo));
 
-        System.out.println("\nOrder Summary Complete.");
+        System.out.println("Delivery is scheduled for " + (deliveryInfo.isEmpty() ? "as soon as order processed" : deliveryInfo));
+
+        System.out.println("Delivery address: " + (deliveryaddress.isEmpty() ? "No change to delivery address" : deliveryaddress));
+
     }
 
     public String getCutlery() {
@@ -216,6 +227,17 @@ class OrderManager {
         System.out.println("Do you want to pay a: online or b: in person?");
         String input = scanner.nextLine().toLowerCase();
         return (input.equals("a") || input.equals("online")) ? "Online payment" : "In person payment";
+    }
+
+    public String orderTime(){
+        System.out.println("Do you want to schedule your order for a specific time? (y/n)");
+        String input = scanner.nextLine().toLowerCase();
+        if (input.equals("y")) {
+            System.out.println("What time do you want to schedule your order for?");
+        } else if (input.equals("n")) {
+            time = "ASAP";
+        }
+        return time;
     }
 
     public String getReview() {
