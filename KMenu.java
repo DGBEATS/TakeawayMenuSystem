@@ -99,6 +99,7 @@ class MenuSystem {
 class OrderManager {
     private List<Order> orders;
     private Scanner scanner;
+    private String deliveryaddress;
 
     public OrderManager() {
         this.orders = new ArrayList<>();
@@ -122,7 +123,8 @@ class OrderManager {
             System.out.println("4. Leave Review");
             System.out.println("5. Extra Information");
             System.out.println("6. Add delivery info");
-            System.out.println("7. Cancel Order");
+            System.out.println("7. Change delivery address/ Add address for guests");
+            System.out.println("8. Cancel Order");
             System.out.print("Choose an option: ");
 
             int choice = scanner.nextInt();
@@ -163,6 +165,10 @@ class OrderManager {
                     System.out.println("Extra delivery details: " + deliveryInfo);
                 }
                 case 7 -> {
+                    deliveryaddress = deliveryAddress();
+                    System.out.println("Delivery address is:" + deliveryaddress);
+                }
+                case 8 -> {
                     System.out.println("Order cancelled.\n");
                     return;
                 }
@@ -241,6 +247,17 @@ class OrderManager {
         }
         return "No delivery information provided";
     }
+
+    public String deliveryAddress() {
+        System.out.println("Would you like to enter a new address for delivery that is not on the system? (y/n)");
+        String input = scanner.nextLine().toLowerCase();
+        if (input.equals("y")) {
+            System.out.println("Enter the address you would like to deliver to:");
+            deliveryaddress = scanner.nextLine();
+            return deliveryaddress;
+        }
+        return "No address change/ collection";
+    }
 }
 
 class Order {
@@ -282,6 +299,7 @@ class ItemDetails {
         this.quantity = quantity;
     }
 }
+
 
 
 
