@@ -1,11 +1,11 @@
+package KMenu;
+
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
 public class KMenu {
-
-
 
     public static void main(String[] args) {
         MenuSystem menuSystem = new MenuSystem();
@@ -43,64 +43,13 @@ class MenuSystem {
             System.out.println("Error reading the menu file: " + e.getMessage());
         }
     }
-
-    public static double foodBasket(Order order) {
-        Scanner scanner = new Scanner(System.in);
-        double basketCost = 0;
-
-        System.out.println("\nEnter the name of the item you want to add to your basket.");
-        System.out.println("Type 'done' when you are finished:");
-
-        while (true) {
-            String input = scanner.nextLine().trim().toLowerCase();
-
-            // Check if the user is done
-            if (input.equals("done")) {
-                break;
-            }
-
-            boolean found = false;
-
-            try (BufferedReader reader = new BufferedReader(new FileReader("src/menu.txt"))) {
-                String line;
-
-                while ((line = reader.readLine()) != null) {
-                    String[] parts = line.split(",");
-                    if (parts.length == 3) {
-                        String itemName = parts[0].trim();
-                        String price = parts[2].trim();
-
-                        double priceAsDouble = Double.parseDouble(price);
-
-                        if (input.equalsIgnoreCase(itemName)) {
-                            // Item found and added to basket
-                            System.out.println("You selected: " + itemName + " - Price: £" + price);
-                            basketCost += priceAsDouble;
-                            order.addItem(itemName, priceAsDouble, 1);
-                            System.out.println("Adding " + itemName + " to your basket...");
-                            System.out.println("Current basket cost: £" + basketCost + "\n");
-                            found = true;
-                            break;
-                        }
-                    }
-                }
-
-                if (!found) {
-                    System.out.println("Please select a valid item from the menu!\n");
-                }
-            } catch (IOException e) {
-                System.out.println("Error reading the menu.txt file: " + e.getMessage());
-            }
-        }
-        return basketCost;
-    }
 }
 
 class OrderManager {
     private List<Order> orders;
     private Scanner scanner;
-    private String deliveryaddress;
-    String time = "";
+    private String deliveryAddress;
+    private String time = "";
 
     public OrderManager() {
         this.orders = new ArrayList<>();
@@ -109,176 +58,123 @@ class OrderManager {
 
     public void processOrder() {
         Order order = new Order();
-        String cutlery = "";
-        String paymentMethod = "";
-        String review = "";
-        String extraInfo = "";
-        String deliveryInfo = "";
         double basketCost = 0;
 
         while (true) {
-            System.out.println("\nOrder Options:");
-            System.out.println("1. Add Items");
-            System.out.println("2. View Order");
-            System.out.println("3. Confirm Order");
-            System.out.println("4. Leave Review");
-            System.out.println("5. Extra Information");
-            System.out.println("6. Add delivery info");
-            System.out.println("7. Change delivery address/ Add address for guests");
-            System.out.println("8. Schedule delivery for later");
-            System.out.println("9. Cancel Order");
-            System.out.print("Choose an option: ");
+            try {
+                System.out.println("\nOrder Options:");
+                System.out.println("1. Add Items");
+                System.out.println("2. View Order");
+                System.out.println("3. Confirm Order");
+                System.out.println("4. Remove Items");
+                System.out.println("5. Add Drink");
+                System.out.println("6. Cancel Order");
+                System.out.print("Choose an option: ");
 
-            int choice = scanner.nextInt();
-            scanner.nextLine();
+                String input = scanner.nextLine();
+                int choice = Integer.parseInt(input);
 
-            switch (choice) {
-                case 1 -> {
-                    MenuSystem menuSystem = new MenuSystem();
-                    menuSystem.displayMenu();
-                    basketCost = MenuSystem.foodBasket(order);
-                    System.out.println("Total Basket Cost: £" + basketCost);
+                switch (choice) {
+                    case 1 -> {
+                        MenuSystem menuSystem = new MenuSystem();
+                        menuSystem.displayMenu();
+                        basketCost = addItemsToBasket(order);
+                        System.out.println("Total Basket Cost: £" + basketCost);
+                    }
+                    case 2 -> order.displayOrder();
+                    case 3 -> {
+                        if (order.isEmpty()) {
+                            System.out.println("You cannot confirm an order without adding items to the basket. Please add items.");
+                            break;
+                        }
+                        orders.add(order);
+                        System.out.println("Order confirmed!");
+                        printReceipt(order, basketCost);
+                        return;
+                    }
+                    case 4 -> removeItemsFromBasket(order);
+                    case 5 -> {
+                        System.out.println("Adding drinks to your order...");
+                        basketCost += addItemsToBasket(order);
+                        System.out.println("Updated Total Basket Cost: £" + basketCost);
+                    }
+                    case 6 -> {
+                        System.out.println("Order cancelled.");
+                        return;
+                    }
+                    default -> System.out.println("Invalid option. Please enter a number between 1 and 6.");
                 }
-                case 2 -> order.displayOrder();
-                case 3 -> {
-                    // Get order details
-                    cutlery = getCutlery();
-                    orders.add(order);
-                    System.out.println("Order confirmed!\nCutlery: " + cutlery);
-
-                    paymentMethod = getPaymentMethod();
-                    System.out.println("Payment Method: " + paymentMethod);
-
-
-                    printOrderSummary(order, basketCost, cutlery, paymentMethod, review, extraInfo, deliveryInfo);
-
-                    return;
-                }
-                case 4 -> {
-                    review = getReview();
-                    System.out.println("Review: " + review);
-                }
-                case 5 -> {
-                    extraInfo = extraInfo();
-                    System.out.println("Extra Information: " + extraInfo);
-                }
-                case 6 -> {
-                    deliveryInfo = deliveryInfo();
-                    System.out.println("Extra delivery details: " + deliveryInfo);
-                }
-                case 7 -> {
-                    deliveryaddress = deliveryAddress();
-                    System.out.println("Delivery address is:" + deliveryaddress);
-                }
-                case 8 ->{
-                    time = orderTime();
-                    System.out.println("Order time: " + time);
-                }
-                case 9 -> {
-                    System.out.println("Order cancelled.\n");
-                    return;
-                }
-                default -> System.out.println("Invalid option.");
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number between 1 and 6.");
             }
         }
     }
 
-    private void printOrderSummary(Order order, double basketCost, String cutlery, String paymentMethod,
-                                   String review, String extraInfo, String deliveryInfo) {
-        System.out.println("\nYour order summary:");
+    private double addItemsToBasket(Order order) {
+        double basketCost = 0;
+        System.out.println("Type the name of the item to add to your basket or type 'done' to finish:");
 
+        while (true) {
+            String input = scanner.nextLine().trim();
 
-        System.out.println("Items ordered:");
+            if (input.equalsIgnoreCase("done")) {
+                break;
+            }
+
+            boolean itemFound = false;
+            try (BufferedReader reader = new BufferedReader(new FileReader("src/menu.txt"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length == 3) {
+                        String itemName = parts[0].trim();
+                        double price = Double.parseDouble(parts[2].trim());
+
+                        if (input.equalsIgnoreCase(itemName)) {
+                            order.addItem(itemName, price, 1);
+                            System.out.println(itemName + " added to your basket!");
+                            basketCost += price;
+                            itemFound = true;
+                            break;
+                        }
+                    }
+                }
+            } catch (IOException e) {
+                System.out.println("Error reading the menu file: " + e.getMessage());
+            }
+
+            if (!itemFound) {
+                System.out.println("Invalid item name. Please select an item from the menu.");
+            }
+        }
+        return basketCost;
+    }
+
+    private void removeItemsFromBasket(Order order) {
+        System.out.println("Enter the name of the item to remove from your basket or type 'done' to finish:");
+
+        while (true) {
+            String input = scanner.nextLine().trim();
+
+            if (input.equalsIgnoreCase("done")) {
+                break;
+            }
+
+            if (order.removeItem(input)) {
+                System.out.println(input + " removed from your basket.");
+            } else {
+                System.out.println("Item not found in your basket.");
+            }
+        }
+    }
+
+    private void printReceipt(Order order, double basketCost) {
+        System.out.println("\n=== RECEIPT ===");
+        System.out.println("Order ID: " + order.getOrderId());
         order.displayOrder();
-
-
-        System.out.println("\nOrder Receipt:");
-
-        System.out.printf("Total Basket Cost: £%.2f\n", basketCost);
-
-
-        System.out.println("Delivery Method: " + (deliveryInfo.isEmpty() ? "Standard" : deliveryInfo));
-
-
-        System.out.println("Cutlery: " + cutlery);
-
-
-        System.out.println("Review: " + (review.isEmpty() ? "No review" : review));
-
-
-        System.out.println("Extra Information: " + (extraInfo.isEmpty() ? "No extra information" : extraInfo));
-
-
-        System.out.println("Delivery Information: " + (deliveryInfo.isEmpty() ? "No additional delivery information" : deliveryInfo));
-
-        System.out.println("Delivery is scheduled for " + (deliveryInfo.isEmpty() ? "as soon as order processed" : deliveryInfo));
-
-        System.out.println("Delivery address: " + (deliveryaddress.isEmpty() ? "No change to delivery address" : deliveryaddress));
-
-    }
-
-    public String getCutlery() {
-        System.out.println("Do you want to add cutlery to the order? (y/n)");
-        String input = scanner.nextLine().toLowerCase();
-        return input.equals("y") ? "Cutlery provided" : "No cutlery provided";
-    }
-
-    public String getPaymentMethod() {
-        System.out.println("Do you want to pay a: online or b: in person?");
-        String input = scanner.nextLine().toLowerCase();
-        return (input.equals("a") || input.equals("online")) ? "Online payment" : "In person payment";
-    }
-
-    public String orderTime(){
-        System.out.println("Do you want to schedule your order for a specific time? (y/n)");
-        String input = scanner.nextLine().toLowerCase();
-        if (input.equals("y")) {
-            System.out.println("What time do you want to schedule your order for?");
-        } else if (input.equals("n")) {
-            time = "ASAP";
-        }
-        return time;
-    }
-
-    public String getReview() {
-        System.out.println("Do you want to leave a review? (y/n)");
-        String input = scanner.nextLine().toLowerCase();
-        if (input.equals("y")) {
-            System.out.println("Leave a review below:");
-            return scanner.nextLine();
-        }
-        return "No review";
-    }
-
-    public String extraInfo() {
-        System.out.println("Do you want to add any extra information to your order? (y/n)");
-        String input = scanner.nextLine().toLowerCase();
-        if (input.equals("y")) {
-            System.out.println("Enter the extra information you would like to add:");
-            return scanner.nextLine();
-        }
-        return "No extra information provided";
-    }
-
-    public String deliveryInfo() {
-        System.out.println("Do you want to add any extra information for delivery? (y/n)");
-        String input = scanner.nextLine().toLowerCase();
-        if (input.equals("y")) {
-            System.out.println("Enter the delivery information you would like to add:");
-            return scanner.nextLine();
-        }
-        return "No delivery information provided";
-    }
-
-    public String deliveryAddress() {
-        System.out.println("Would you like to enter a new address for delivery that is not on the system? (y/n)");
-        String input = scanner.nextLine().toLowerCase();
-        if (input.equals("y")) {
-            System.out.println("Enter the address you would like to deliver to:");
-            deliveryaddress = scanner.nextLine();
-            return deliveryaddress;
-        }
-        return "No address change/ collection";
+        System.out.printf("Total Cost: £%.2f\n", basketCost);
+        System.out.println("Payment Method: Online");
+        System.out.println("Thank you for your purchase!");
     }
 }
 
@@ -295,6 +191,22 @@ class Order {
     public void addItem(String itemName, double price, int quantity) {
         items.putIfAbsent(itemName, new ItemDetails(price, 0));
         items.get(itemName).quantity += quantity;
+    }
+
+    public boolean removeItem(String itemName) {
+        if (items.containsKey(itemName)) {
+            items.remove(itemName);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean isEmpty() {
+        return items.isEmpty();
+    }
+
+    public int getOrderId() {
+        return orderId;
     }
 
     public void displayOrder() {
@@ -321,9 +233,3 @@ class ItemDetails {
         this.quantity = quantity;
     }
 }
-
-
-
-
-
-
