@@ -1,3 +1,4 @@
+package takeaway;
 
 import java.io.*;
 import java.util.*;
@@ -87,18 +88,50 @@ public class Login {
             System.out.println("Error: Password cannot contain commas.");
             password = scanner.nextLine();
         }
+        
+      //PHONE NUMBER + VALIDATION
+        System.out.println("Enter your phone number (numbers only): ");
+        String phone = scanner.nextLine();
+        while (!phone.matches("\\d+")) {
+        	System.out.println("Invalid phone number. Please enter numbers only:");
+        	phone = scanner.nextLine();
+        }
+        
+        //EMAIL + VALIDATION
+        System.out.println("Enter your email address: ");
+        String email = scanner.nextLine();
+        while (!email.contains("@") || !email.contains(".")) {
+        	System.out.println("Invalid email format. Please enter a valid email address: ");
+        	email = scanner.nextLine();
+        }
+        
+        //ADDRESS + VALIDATION
+        System.out.println("Enter your address (no commmas allowed): ");
+        String address = scanner.nextLine();
+        while (address.contains(",")) {
+        	System.out.println("Address cannot contains commas. Please enter again: ");
+        	address = scanner.nextLine();
+        }
+        
+        //BANK DETAILS + VALIDATION
+        System.out.println("Enter your card number (16 digits): ");
+        String cardNumber = scanner.nextLine();
+        while (!cardNumber.matches("\\d{16}")) {
+        	System.out.println("Invalid card number. Please enter 16 digits: ");
+        	cardNumber = scanner.nextLine();
+        }
 
-        if (addCredentials(username, password, userType)) {
+        if (addCredentials(username, password, userType, phone, email, address, cardNumber)) {
             System.out.println("Account created successfully! You can now log in.");
-            login(userType); // Fixed bug where program would stop after account creation
         } else {
             System.out.println("Error creating account. Please try again.");
         }
+        scanner.close();
     }
 
-    private static boolean addCredentials(String username, String password, String userType) {
+    private static boolean addCredentials(String username, String password, String userType, String phone, String email, String address, String cardNumber) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
-            writer.write(username + "," + password + "," + userType);
+            writer.write(username + "," + password + "," + userType + "," + phone + "," + email + "," + address + "," + cardNumber);
             writer.newLine();
             return true;
         } catch (IOException e) {
