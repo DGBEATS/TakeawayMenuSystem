@@ -62,6 +62,38 @@ public class AdminMenu {
         }
     }
     
+    public static void displayFeedback() {
+    	try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME4))){
+    		String line;
+    		while ((line = reader.readLine()) != null) {
+    			String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String cusUsername = parts[0].trim();
+                    String feedback = parts[1].trim();
+                    System.out.println(cusUsername + " - " + feedback);
+                }
+    		}
+    	}catch (IOException e) {
+            System.out.println("Error reading the feedback file: " + e.getMessage());
+        }
+    }
+    
+    public static void displayRatings() {
+    	try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME5))){
+    		String line;
+    		while ((line = reader.readLine()) != null) {
+    			String[] parts = line.split(",");
+                if (parts.length == 2) {
+                    String cusUsername = parts[0].trim();
+                    String rating = parts[1].trim();
+                    System.out.println(cusUsername + " - " + rating + " out of 5.");
+                }
+    		}
+    	}catch (IOException e) {
+            System.out.println("Error reading the rating file: " + e.getMessage());
+        }
+    }
+    
     public static void displayAdminAccounts() {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME2))) {
             String line;
@@ -159,18 +191,18 @@ public class AdminMenu {
         	break;
         case "k":
         	System.out.println("\n Current feedbacks: \n");
-        	// displayFeedback(); // TO DO by someone else
+        	displayFeedback();
         	choice = choice();
         	useChoice();
         	break;
         case "l":
         	System.out.println("\n Current ratings: \n");
-        	//displayRatings(); // TO DO by someone else
+        	displayRatings();
         	choice = choice();
         	useChoice();
         	break;
         case "m":
-        	//signOut(); // TO DO by someone else
+        	signOut();
         	break;
         default:
         	System.out.println("Please enter a correct option.");
@@ -179,7 +211,13 @@ public class AdminMenu {
         	break;
         }
     }
-
+    
+    public static void signOut() {
+        System.out.println("Signing out...");
+        Login login = new Login();
+        login.start();
+        
+    }
     
     public static void addItemToMenu() {
     	System.out.println("\n Current menu: \n");
@@ -780,5 +818,7 @@ public static void deleteCustomerAccount() {
     	}
     	
     }
+    
+
     
 }

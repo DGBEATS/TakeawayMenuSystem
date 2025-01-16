@@ -1,0 +1,2 @@
+customerUsername, 5
+CustomerUsername2, 4.50
