@@ -170,11 +170,9 @@ public class Login {
                         userFound = true;
 
                         System.out.println("Account Details:");
-                        for (int i = 0; i < details.length; i++) {
-                            if (i == 1) continue; // Skip password
-                            System.out.println("Username: " + details[0]);
-                            System.out.println("User Type: " + details[2]);
-                        }
+                        
+                        System.out.println("Username: " + details[0]);
+                        System.out.println("User Type: " + details[2]);
                         break;
                     }
                 }
