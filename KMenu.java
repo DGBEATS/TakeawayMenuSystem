@@ -1,10 +1,11 @@
+package Menu;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class KMenu {
+public class Menu {
 
     public static void main(String[] args) {
         MenuSystem menuSystem = new MenuSystem();
@@ -237,27 +238,45 @@ class MenuSystem {
 
         public String getCutlery() {
             System.out.println("Do you want to add cutlery to the order? (y/n)");
-            String input = scanner.nextLine().toLowerCase();
+            String input = scanner.nextLine().trim().toLowerCase();
+
             if (input.equals("y")) {
-                System.out.println("Do you want to opt for eco friendly cutlery? (y/n)");
-                input = scanner.nextLine().toLowerCase();
+                System.out.println("Do you want to opt for eco-friendly cutlery? (y/n)");
+                input = scanner.nextLine().trim().toLowerCase();
+
                 if (input.equals("y")) {
                     System.out.println("You will be provided with recycled cutlery.");
-                    return "Eco friendly cutlery provided";
-                } else {
+                    return "Eco-friendly cutlery provided";
+                } else if (input.equals("n")) {
                     System.out.println("You will be provided with normal cutlery.");
                     return "Plastic cutlery";
+                } else {
+                    System.out.println("Invalid input. Defaulting to no cutlery.");
+                    return "No cutlery";
                 }
+            } else if (input.equals("n")) {
+                System.out.println("No cutlery will be added to your order.");
+                return "No cutlery";
             } else {
-                System.out.println("You will not be provided with cutlery.");
+                System.out.println("Invalid input. Defaulting to no cutlery.");
                 return "No cutlery";
             }
         }
 
         public String getPaymentMethod() {
-            System.out.println("Do you want to pay a: online or b: in person?");
-            String input = scanner.nextLine().toLowerCase();
-            return (input.equals("a") || input.equals("online")) ? "Online payment" : "In person payment";
+            String input;
+            while (true) {
+                System.out.println("Do you want to pay a: online or b: in person?");
+                input = scanner.nextLine().trim().toLowerCase();
+
+                if (input.equals("a") || input.equals("online")) {
+                    return "Online payment";
+                } else if (input.equals("b") || input.equals("in person")) {
+                    return "In person payment";
+                } else {
+                    System.out.println("Invalid input. Please enter 'a' for online payment or 'b' for in-person payment.");
+                }
+            }
         }
 
         public String orderTime(){
@@ -449,5 +468,4 @@ class MenuSystem {
         }
     }
 }
-
 
