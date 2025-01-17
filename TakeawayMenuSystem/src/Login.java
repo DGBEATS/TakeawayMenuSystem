@@ -1,12 +1,10 @@
-package takeaway;
-
 import java.io.*;
 import java.util.*;
 
 public class Login {
 
     private static final String FILE_NAME = "src/credentials.txt";
-    private static String username;
+    public static String username;
     private static String password;
     private static String userType;
 
@@ -72,6 +70,33 @@ public class Login {
         return false;
     }
 
+    // to check if the user is logged in for meny class
+    public static boolean isUserLoggedIn() {
+        return username != null && password != null;
+    }
+
+    //to retrieve card details of register users who are logged into system
+    public static String getUserCardDetails()
+    {
+
+        try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME)))
+        {
+        String line;
+        while ((line = reader.readLine()) != null) {
+            String[] cardDetails = line.split(",");
+            if (cardDetails[0].equals(username))
+            {
+                String longCard = cardDetails[6];
+                String shortCard = longCard.substring(longCard.length() - 4);
+                return shortCard;
+            }
+        }
+        } catch (IOException e) {
+            System.out.println("Error reading the card details file: " + e.getMessage());
+        }
+        return null;
+    }
+
     private static void createAccount(String userType) {
         System.out.println("Enter a new username:");
         username = scanner.nextLine();
@@ -88,37 +113,37 @@ public class Login {
             System.out.println("Error: Password cannot contain commas.");
             password = scanner.nextLine();
         }
-        
-      //PHONE NUMBER + VALIDATION
+
+        //PHONE NUMBER + VALIDATION
         System.out.println("Enter your phone number (numbers only): ");
         String phone = scanner.nextLine();
         while (!phone.matches("\\d+")) {
-        	System.out.println("Invalid phone number. Please enter numbers only:");
-        	phone = scanner.nextLine();
+            System.out.println("Invalid phone number. Please enter numbers only:");
+            phone = scanner.nextLine();
         }
-        
+
         //EMAIL + VALIDATION
         System.out.println("Enter your email address: ");
         String email = scanner.nextLine();
         while (!email.contains("@") || !email.contains(".")) {
-        	System.out.println("Invalid email format. Please enter a valid email address: ");
-        	email = scanner.nextLine();
+            System.out.println("Invalid email format. Please enter a valid email address: ");
+            email = scanner.nextLine();
         }
-        
+
         //ADDRESS + VALIDATION
         System.out.println("Enter your address (no commmas allowed): ");
         String address = scanner.nextLine();
         while (address.contains(",")) {
-        	System.out.println("Address cannot contains commas. Please enter again: ");
-        	address = scanner.nextLine();
+            System.out.println("Address cannot contains commas. Please enter again: ");
+            address = scanner.nextLine();
         }
-        
+
         //BANK DETAILS + VALIDATION
         System.out.println("Enter your card number (16 digits): ");
         String cardNumber = scanner.nextLine();
         while (!cardNumber.matches("\\d{16}")) {
-        	System.out.println("Invalid card number. Please enter 16 digits: ");
-        	cardNumber = scanner.nextLine();
+            System.out.println("Invalid card number. Please enter 16 digits: ");
+            cardNumber = scanner.nextLine();
         }
 
         if (addCredentials(username, password, userType, phone, email, address, cardNumber)) {
@@ -170,7 +195,7 @@ public class Login {
                         userFound = true;
 
                         System.out.println("Account Details:");
-                        
+
                         System.out.println("Username: " + details[0]);
                         System.out.println("User Type: " + details[2]);
                         break;
