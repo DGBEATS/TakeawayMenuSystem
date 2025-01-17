@@ -1,0 +1,62 @@
+# addItem/deleteItem/updateItemPrice/seeMenu
+
+#Input Item
+ Item Name:
+	Valid
+	Invalid
+ Item Type
+	Food
+	Drink
+	Invalid
+ Item Price
+	Positive
+	Zero
+	Negative
+	Invalid
+
+#Constraints for Add Item:
+  - [If ItemName = Invalid] => [Error]
+  - [If ItemType = Invalid] => [Error]
+  - [If itemPrice = Zero or Negative or Invalid] => [Error]
+  - [If itemName = Valid AND itemType = (Food OR Drink) AND itemPrice = Positive] => [Success]
+
+
+# addDiscount/DeleteDiscount/seeDiscountList
+
+#Input Discount
+ Discount Code:
+	Valid
+	Invalid
+	
+ Discount Percentage:
+	Positive  # <=100
+	Zero
+	Negative
+	Invalid
+
+# Constraints for Add Discount:
+  - [If discountCode = Invalid] => [Error]
+  - [If discountPercentage = Zero or Negative or Invalid] => [Error]
+  - [If discountCode = Valid AND discountPercentage = Positive] => [Success]
+
+# addAdmin/deleteAdmin/deleteCustomer
+	
+#Input Account
+ Account username:
+	Valid
+	Invalid
+
+ Account password:
+	Valid
+	Invalid
+
+ Account type:
+	admin
+	customer
+	Invalid
+
+# Constraints for Add Account:
+  - [If accountUsername = Invalid] => [Error]
+  - [If accountPassword = Invalid] => [Error]
+  - [If accountType = Invalid] => [Error]
+  - [If accountUsername = Valid AND accountPassword = Valid AND accountType = (admin OR customer)] => [Success]
