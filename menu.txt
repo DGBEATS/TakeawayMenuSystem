@@ -1,7 +1,8 @@
-Chow Mein, food,6.99,1
-Egg Fried Rice, food,4.99,2
-Coca-Cola, drink,2.99,3
-Lamb Chops, food,10.99,4
-Special Chow Mein, food,8.99,5
-Curry Sauce, food,2.99,6
-Salt Pepper Chips, food,5.00,7
+Chow Mein,food,6.99,1
+Egg Fried Rice,food,4.99,2
+Coca-Cola,drink,2.99,3
+Lamb Chops,food,10.99,4
+Special Chow Mein,food,8.99,5
+Curry Sauce,food,2.99,6
+Salt Pepper Chips,food,5.00,7
+Salt Pepper Prawns, food,3.7,8

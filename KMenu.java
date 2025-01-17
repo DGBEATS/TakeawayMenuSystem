@@ -1,11 +1,9 @@
-package Menu;
-
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.*;
 
-public class Menu {
+public class KMenu {
 
     public static void main(String[] args) {
         MenuSystem menuSystem = new MenuSystem();
@@ -23,8 +21,45 @@ class MenuSystem {
     }
 
     public void start() {
+        String cardDetails = checkUserLoggedIn();
+        if (cardDetails == null)
+        {
+            System.out.println("You are not logged in. Proceeding as a guest.");
+            addGuestCardDetails();
+        }
+        else {
+            System.out.println("Welcome back, " + Login.username + "! The card we have on file is: " + cardDetails);
+        }
+
         displayMenu();
         orderManager.processOrder();
+    }
+
+    //check if user is logged in to retrieve the appropriate card details
+    private String checkUserLoggedIn()
+    {
+        if (Login.isUserLoggedIn())
+        {
+            System.out.println("Looking for card details....");
+            return Login.getUserCardDetails();
+        }
+        return null;
+    }
+
+    //if user not registered, allow them to enter a new card number
+    private  void addGuestCardDetails() {
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Hi Guest! Please enter your card number (16 digits):");
+
+        while (true) {
+            String cardNumber = scanner.nextLine().trim();
+            if (cardNumber.matches("\\d{16}")) {
+                System.out.println("Card details saved successfully.");
+                break;
+            } else {
+                System.out.println("Invalid card number. Please enter a valid 16-digit card number:");
+            }
+        }
     }
 
     public void displayMenu() {
@@ -33,10 +68,11 @@ class MenuSystem {
             System.out.println("\n=== MENU ===");
             while ((line = reader.readLine()) != null) {
                 String[] parts = line.split(",");
-                if (parts.length == 3) {
+                if (parts.length == 4) {
                     String itemName = parts[0].trim();
                     String price = parts[2].trim();
-                    System.out.println(itemName + " - " + price);
+                    String id = parts[3].trim();
+                    System.out.println(id +"." + itemName + " - " + price);
                 }
             }
         } catch (IOException e) {
@@ -127,6 +163,7 @@ class MenuSystem {
             String review = "";
             String extraInfo = "";
             String deliveryInfo = "";
+            String deliveryMethod = "";
 
             while (true) {
                 System.out.println("\nOrder Options:");
@@ -160,6 +197,12 @@ class MenuSystem {
                             System.out.println("You cannot confirm an order without adding items to the basket. Please add items.");
                             break;
                         }
+
+                        //call methods to handle order process
+                        getDiscount(basketCost);
+                        deliveryMethod = getCollectChoice(basketCost);
+                        System.out.println("You selected: " + deliveryMethod);
+
                         orders.add(order);
 
                         // Get order details
@@ -169,7 +212,7 @@ class MenuSystem {
                         printReceipt(order, basketCost);
                         System.out.println("Payment Method: " + paymentMethod);
 
-                        printOrderSummary(order, basketCost, cutlery, review, extraInfo, deliveryInfo, deliveryaddress);
+                        printOrderSummary(order, basketCost, cutlery, review, extraInfo, deliveryInfo, deliveryMethod, deliveryaddress);
                         return;
                     }
                     case 4 -> {
@@ -211,7 +254,7 @@ class MenuSystem {
         }
 
 
-        private void printOrderSummary(Order order, double basketCost, String cutlery, String review, String extraInfo, String deliveryInfo, String deliveryAddress) {
+        private void printOrderSummary(Order order, double basketCost, String cutlery, String review, String extraInfo, String deliveryInfo, String deliveryMethod,String deliveryAddress) {
             System.out.println("\nYour order summary:");
 
             System.out.println("Items ordered:");
@@ -220,7 +263,7 @@ class MenuSystem {
             System.out.println("\nOrder Receipt:");
             System.out.printf("Total Basket Cost: £%.2f%n%n", basketCost);
 
-            System.out.println("Delivery Method: " + (isNullOrEmpty(deliveryInfo) ? "Standard" : deliveryInfo));
+            System.out.println("Delivery Method: " + (isNullOrEmpty(deliveryMethod) ? "Standard delivery" : deliveryMethod));
             System.out.println("Cutlery: " + cutlery);
             System.out.println("Review: " + (isNullOrEmpty(review) ? "No review" : review));
             System.out.println("Extra Information: " + (isNullOrEmpty(extraInfo) ? "No extra information" : extraInfo));
@@ -235,48 +278,92 @@ class MenuSystem {
             return str == null || str.isEmpty();
         }
 
+        // allows users to enter a discount for a lesser order cost
+        public void getDiscount(double basketCost) {
+            System.out.println("Please enter a discount code, if you have one:");
+            String input = scanner.nextLine().trim().toLowerCase();
+
+            boolean discountApplied = false; // Tracks if a discount was successfully applied
+
+            try (BufferedReader reader = new BufferedReader(new FileReader("src/discounts.txt"))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] parts = line.split(",");
+                    if (parts.length == 2) {
+                        String discountCode = parts[0].trim().toLowerCase();
+                        String percentage = parts[1].trim();
+
+                        // Check if the user input matches the discount code
+                        if (input.equals(discountCode)) {
+                            System.out.println("Discount valid! You're saving " + percentage + "%.");
+                            double discountValue = Double.parseDouble(percentage) / 100.0; // Calculate percentage as decimal
+                            basketCost *= (1 - discountValue); // Apply discount to the basket cost
+                            System.out.printf("Updated Basket Cost: £%.2f%n", basketCost);
+                            discountApplied = true;
+                            break; // Exit loop after applying discount
+                        }
+                    }
+                }
+
+                if (!discountApplied) {
+                    System.out.println("Invalid discount code. No discount applied.");
+                }
+
+            } catch (IOException e) {
+                System.out.println("Error reading the file: " + e.getMessage());
+            }
+        }
 
         public String getCutlery() {
             System.out.println("Do you want to add cutlery to the order? (y/n)");
-            String input = scanner.nextLine().trim().toLowerCase();
-
+            String input = scanner.nextLine().toLowerCase();
             if (input.equals("y")) {
-                System.out.println("Do you want to opt for eco-friendly cutlery? (y/n)");
-                input = scanner.nextLine().trim().toLowerCase();
-
+                System.out.println("Do you want to opt for eco friendly cutlery? (y/n)");
+                input = scanner.nextLine().toLowerCase();
                 if (input.equals("y")) {
                     System.out.println("You will be provided with recycled cutlery.");
-                    return "Eco-friendly cutlery provided";
-                } else if (input.equals("n")) {
+                    return "Eco friendly cutlery provided";
+                } else {
                     System.out.println("You will be provided with normal cutlery.");
                     return "Plastic cutlery";
-                } else {
-                    System.out.println("Invalid input. Defaulting to no cutlery.");
-                    return "No cutlery";
                 }
-            } else if (input.equals("n")) {
-                System.out.println("No cutlery will be added to your order.");
-                return "No cutlery";
             } else {
-                System.out.println("Invalid input. Defaulting to no cutlery.");
+                System.out.println("You will not be provided with cutlery.");
                 return "No cutlery";
             }
         }
 
-        public String getPaymentMethod() {
-            String input;
-            while (true) {
-                System.out.println("Do you want to pay a: online or b: in person?");
-                input = scanner.nextLine().trim().toLowerCase();
+        //handles collect choice - allows user to choose how'd they like to receive their meal
+        public String getCollectChoice(double basketCost) {
+            System.out.println("Would you like a. delivery or b. collection?");
+            String input = scanner.nextLine().toLowerCase();
 
-                if (input.equals("a") || input.equals("online")) {
-                    return "Online payment";
-                } else if (input.equals("b") || input.equals("in person")) {
-                    return "In person payment";
+            if (input.equals("a") || input.equals("delivery")) {
+                System.out.println("Would you like to receive priority delivery? This is an extra charge of £2, and food will arrive within 15 minutes. (y/n)");
+                input = scanner.nextLine().toLowerCase();
+
+                if (input.equals("y")) {
+                    System.out.println("You have selected priority delivery.");
+                    basketCost += 2;
+                    System.out.println("\nUpdated basket cost: £" + basketCost);
+                    return "Priority delivery";
                 } else {
-                    System.out.println("Invalid input. Please enter 'a' for online payment or 'b' for in-person payment.");
+                    System.out.println("You have selected standard delivery.");
+                    return "Standard delivery";
                 }
+            } else if (input.equals("b") || input.equals("collection")) {
+                System.out.println("You have selected collection.");
+                return "Collection";
             }
+
+            System.out.println("Invalid choice. Defaulting to collection.");
+            return "Collection";
+        }
+
+        public String getPaymentMethod() {
+            System.out.println("Do you want to pay a: online or b: in person?");
+            String input = scanner.nextLine().toLowerCase();
+            return (input.equals("a") || input.equals("online")) ? "Online payment" : "In person payment";
         }
 
         public String orderTime(){
@@ -333,7 +420,7 @@ class MenuSystem {
 
         private double foodBasket(Order order) {
             double basketCost = 0;
-            System.out.println("Type the name of the item to add to your basket or type 'done' to finish:");
+            System.out.println("Type the number of the item to add to your basket or type 'done' to finish:");
 
             while (true) {
                 String input = scanner.nextLine().trim();
@@ -347,12 +434,13 @@ class MenuSystem {
                     String line;
                     while ((line = reader.readLine()) != null) {
                         String[] parts = line.split(",");
-                        if (parts.length == 3) {
+                        if (parts.length == 4) {
                             String itemName = parts[0].trim();
+                            String id = parts[3];
                             // Remove currency symbols or any non-numeric characters
                             double price = Double.parseDouble(parts[2].trim().replace("£", "").replace("$", ""));
 
-                            if (input.equalsIgnoreCase(itemName)) {
+                            if (input.equalsIgnoreCase(id)) {
                                 order.addItem(itemName, price, 1);
                                 System.out.println(itemName + " added to your basket!");
                                 basketCost += price;
@@ -468,4 +556,5 @@ class MenuSystem {
         }
     }
 }
+
 
