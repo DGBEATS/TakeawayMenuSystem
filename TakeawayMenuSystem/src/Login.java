@@ -1,3 +1,6 @@
+package takeaway;
+
+
 import java.io.*;
 import java.util.*;
 
@@ -52,7 +55,7 @@ public class Login {
         }
     }
 
-    private static boolean validateCredentials(String username, String password, String userType) {
+    public static boolean validateCredentials(String username, String password, String userType) {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
@@ -154,7 +157,7 @@ public class Login {
         scanner.close();
     }
 
-    private static boolean addCredentials(String username, String password, String userType, String phone, String email, String address, String cardNumber) {
+    public static boolean addCredentials(String username, String password, String userType, String phone, String email, String address, String cardNumber) {
         try (BufferedWriter writer = new BufferedWriter(new FileWriter(FILE_NAME, true))) {
             writer.write(username + "," + password + "," + userType + "," + phone + "," + email + "," + address + "," + cardNumber);
             writer.newLine();
@@ -165,7 +168,7 @@ public class Login {
         return false;
     }
 
-    private static boolean usernameExists(String username) {
+    public static boolean usernameExists(String username) {
         try (BufferedReader reader = new BufferedReader(new FileReader(FILE_NAME))) {
             String line;
             while ((line = reader.readLine()) != null) {
